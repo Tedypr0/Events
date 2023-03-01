@@ -23,12 +23,12 @@ public class Helper {
     }
 
     public void eventCreation() {
-        for (int j = 0; j <= 4; j++) {
+        for (int j = 0; j <= 1000; j++) {
             queue.add(new Event(0, String.format("Event %d %d", 0, j)));
         }
 
         for(int i = 1; i< 5; i++){
-            for (int j = 0; j< 5; j++){
+            for (int j = 0; j< 100; j++){
                 queue.add(new Event(i, String.format("Event %d %d", i, j)));
             }
         }

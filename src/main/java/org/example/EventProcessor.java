@@ -31,7 +31,7 @@ public class EventProcessor extends Thread {
                     Event event = null;
                     while (!events.isEmpty()) {
                         event = events.poll();
-                        System.out.printf("%s works with Event %s%n", this.getName(), event.getMessage());
+                    //    System.out.printf("%s works with Event %s%n", this.getName(), event.getMessage());
                     }
                     assert event != null;
                     refKeeper.remove(event.hashCode());
