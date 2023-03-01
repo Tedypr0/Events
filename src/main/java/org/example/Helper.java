@@ -2,6 +2,8 @@ package org.example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,10 +14,12 @@ public class Helper {
     private static AtomicBoolean isPoisonFound = null;
     private static UniqueEventsQueue<Event> queue = null;
     private final List<EventProcessor> threads = new ArrayList<>();
+    private final Map<Integer, Queue<Event>> refKeeper = new ConcurrentHashMap<>();
 
     public Helper() {
         isPoisonFound = new AtomicBoolean(false);
-        queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), new ConcurrentHashMap<>());
+
+        queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), refKeeper);
     }
 
     public void eventCreation() {
@@ -34,7 +38,7 @@ public class Helper {
 
     public void threadCreation() {
         for (int i = 0; i < THREAD_NUMBER; i++) {
-            threads.add(new EventProcessor(isPoisonFound, queue));
+            threads.add(new EventProcessor(isPoisonFound, queue, refKeeper));
             threads.get(i).start();
         }
     }

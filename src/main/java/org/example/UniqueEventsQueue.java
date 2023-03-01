@@ -16,17 +16,17 @@ public class UniqueEventsQueue<T> {
         this.refKeeper = refKeeper;
     }
 
-    public synchronized void add(T element){
-        if(element.hashCode() == Integer.MAX_VALUE){
+    public synchronized void add(T element) {
+        if (element.hashCode() == Integer.MAX_VALUE) {
             Queue<T> poisonousQueue = new ConcurrentLinkedQueue<>();
             poisonousQueue.add(element);
             eventsQueues.add(poisonousQueue);
             notify();
             return;
         }
-        if(refKeeper.containsKey(element.hashCode())){
+        if (refKeeper.containsKey(element.hashCode())) {
             refKeeper.get(element.hashCode()).add(element);
-        }else{
+        } else {
             Queue<T> newQueue = new ConcurrentLinkedQueue<>();
             newQueue.add(element);
             refKeeper.put(element.hashCode(), newQueue);
@@ -35,14 +35,14 @@ public class UniqueEventsQueue<T> {
         notify();
     }
 
-    public synchronized Queue<T> poll() throws InterruptedException{
-        while(eventsQueues.isEmpty()){
+    public synchronized Queue<T> poll() throws InterruptedException {
+        while (eventsQueues.isEmpty()) {
             wait();
         }
 
         Queue<T> queue = eventsQueues.peek();
 
-        if(queue.peek() != null && queue.peek().hashCode() == Integer.MAX_VALUE){
+        if (queue.peek() != null && queue.peek().hashCode() == Integer.MAX_VALUE) {
             notify();
             return queue;
         }
