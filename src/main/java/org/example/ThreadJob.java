@@ -4,12 +4,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EventProcessor extends Thread {
+public class ThreadJob implements Runnable {
     private final AtomicBoolean isPoisonFound;
     private final UniqueEventsQueue<Event> eventsQueues;
     private final Map<Integer, Queue<Event>> refKeeper;
 
-    public EventProcessor(AtomicBoolean isPoisonFound, UniqueEventsQueue<Event> eventsQueues, Map<Integer, Queue<Event>> refKeeper) {
+    public ThreadJob(AtomicBoolean isPoisonFound, UniqueEventsQueue<Event> eventsQueues, Map<Integer, Queue<Event>> refKeeper) {
         this.isPoisonFound = isPoisonFound;
         this.eventsQueues = eventsQueues;
         this.refKeeper = refKeeper;
@@ -31,7 +31,6 @@ public class EventProcessor extends Thread {
                     Event event = null;
                     while (!events.isEmpty()) {
                         event = events.poll();
-                    //    System.out.printf("%s works with Event %s%n", this.getName(), event.getMessage());
                     }
                     assert event != null;
                     refKeeper.remove(event.hashCode());

@@ -13,17 +13,16 @@ public class Helper {
     private static final int THREAD_NUMBER = 4;
     private static AtomicBoolean isPoisonFound = null;
     private static UniqueEventsQueue<Event> queue = null;
-    private final List<EventProcessor> threads = new ArrayList<>();
+    private final List<Thread> threads = new ArrayList<>();
     private final Map<Integer, Queue<Event>> refKeeper = new ConcurrentHashMap<>();
 
     public Helper() {
         isPoisonFound = new AtomicBoolean(false);
-
         queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), refKeeper);
     }
 
     public void eventCreation() {
-        for (int j = 0; j <= 1000; j++) {
+        for (int j = 0; j <= 100; j++) {
             queue.add(new Event(0, String.format("Event %d %d", 0, j)));
         }
 
@@ -37,9 +36,10 @@ public class Helper {
     }
 
     public void threadCreation() {
-        for (int i = 0; i < THREAD_NUMBER; i++) {
-            threads.add(new EventProcessor(isPoisonFound, queue, refKeeper));
-            threads.get(i).start();
-        }
+        Runnable threadJob = new ThreadJob(isPoisonFound, queue, refKeeper);
+            for (int i = 0; i < THREAD_NUMBER; i++) {
+                threads.add(new Thread(threadJob));
+                threads.get(i).start();
+            }
     }
 }
