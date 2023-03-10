@@ -22,26 +22,20 @@ public class ThreadJob implements Runnable {
     public void run() {
         while (!isPoisonFound.get()) {
             Queue<Event> events;
-            Event lastEvent;
             try {
                 events = eventsQueues.poll();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
-            lastEvent = events.peek();
-            if (lastEvent != null) {
+            if (events.peek() != null) {
                 if (events.peek().getMessage().equals(Helper.POISON_MESSAGE)) {
                     isPoisonFound.set(true);
                 } else {
-                    while (events.peek() != null) {
-                        lastEvent = events.poll();
-                        assert lastEvent != null;
-                      //  System.out.println(lastEvent.getMessage());
+                    while (!events.isEmpty()) {
+                        Helper.checkIfQueueIsEmptyAndRemoveFromRefKeeper(events, refKeeper);
                         counter.getAndIncrement();
                     }
                 }
-                refKeeper.remove(lastEvent.hashCode());
             }
         }
     }

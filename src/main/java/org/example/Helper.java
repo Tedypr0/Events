@@ -14,10 +14,11 @@ public class Helper {
     private static final int THREAD_NUMBER = 4;
     private static AtomicBoolean isPoisonFound = null;
     private static UniqueEventsQueue<Event> queue = null;
-    private final List<Thread> threads = new ArrayList<>();
-    private final Map<Integer, Queue<Event>> refKeeper = new ConcurrentHashMap<>();
     // For counting processed Events.
     public final AtomicInteger counter = new AtomicInteger(0);
+    private final List<Thread> threads = new ArrayList<>();
+    private final Map<Integer, Queue<Event>> refKeeper = new ConcurrentHashMap<>();
+
     public Helper() {
         isPoisonFound = new AtomicBoolean(false);
         queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), refKeeper);
@@ -28,11 +29,11 @@ public class Helper {
             queue.add(new Event(0, String.format("Event %d %d", 0, j)));
         }
 
-        for(int i = 1; i< 5; i++){
-            for (int j = 0; j< 5; j++){
+        for (int i = 1; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
                 queue.add(new Event(i, String.format("Event %d %d", i, j)));
                 // Added to check if our producer is slow, would we process all Events.
-                Thread.sleep(5000);
+                Thread.sleep(100);
             }
         }
 
@@ -40,10 +41,17 @@ public class Helper {
     }
 
     public void threadCreation() {
-        Runnable threadJob = new ThreadJob(isPoisonFound, queue, refKeeper,counter);
-            for (int i = 0; i < THREAD_NUMBER; i++) {
-                threads.add(new Thread(threadJob));
-                threads.get(i).start();
-            }
+        Runnable threadJob = new ThreadJob(isPoisonFound, queue, refKeeper, counter);
+        for (int i = 0; i < THREAD_NUMBER; i++) {
+            threads.add(new Thread(threadJob));
+            threads.get(i).start();
+        }
+    }
+
+public static synchronized void checkIfQueueIsEmptyAndRemoveFromRefKeeper(Queue<Event> queueToCheck, Map<Integer,Queue<Event>> refKeeperToRemoveFrom){
+        Event eventToReturn = queueToCheck.poll();
+        if(queueToCheck.isEmpty() && eventToReturn !=null){
+            refKeeperToRemoveFrom.remove(eventToReturn.hashCode());
+        }
     }
 }
