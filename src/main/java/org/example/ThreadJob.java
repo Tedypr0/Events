@@ -34,7 +34,7 @@ public class ThreadJob implements Runnable {
                 if (events.peek().getMessage().equals(Helper.POISON_MESSAGE)) {
                     isPoisonFound.set(true);
                 } else {
-                    while (events.peek() != null && !events.peek().getMessage().equals(Helper.POISON_MESSAGE)) {
+                    while (events.peek() != null) {
                         lastEvent = events.poll();
                         assert lastEvent != null;
                       //  System.out.println(lastEvent.getMessage());
