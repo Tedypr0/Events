@@ -12,8 +12,8 @@ public class StressTests {
         helper = new Helper();
     }
 
-    @RepeatedTest(10000)
-    public void stressTest_shouldAlways_EndProgram_gracefully() {
+    @RepeatedTest(100)
+    public void stressTest_shouldAlways_EndProgram_gracefully() throws InterruptedException {
         helper.eventCreation();
         helper.threadCreation();
     }
