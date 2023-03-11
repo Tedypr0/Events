@@ -11,7 +11,8 @@ public class ThreadJob implements Runnable {
     private final Map<Integer, Queue<Event>> refKeeper;
     private final AtomicInteger counter;
 
-    public ThreadJob(AtomicBoolean isPoisonFound, UniqueEventsQueue<Event> eventsQueues, Map<Integer, Queue<Event>> refKeeper, AtomicInteger counter) {
+    public ThreadJob(AtomicBoolean isPoisonFound, UniqueEventsQueue<Event> eventsQueues,
+                     Map<Integer, Queue<Event>> refKeeper, AtomicInteger counter) {
         this.isPoisonFound = isPoisonFound;
         this.eventsQueues = eventsQueues;
         this.refKeeper = refKeeper;
@@ -22,6 +23,7 @@ public class ThreadJob implements Runnable {
     public void run() {
         while (!isPoisonFound.get()) {
             Queue<Event> events;
+            Event lastEvent = null;
             try {
                 events = eventsQueues.poll();
             } catch (InterruptedException e) {
@@ -32,8 +34,9 @@ public class ThreadJob implements Runnable {
                     isPoisonFound.set(true);
                 } else {
                     while (!events.isEmpty()) {
-                        Helper.checkIfQueueIsEmptyAndRemoveFromRefKeeper(events, refKeeper);
+                        lastEvent = events.poll();
                         counter.getAndIncrement();
+                        eventsQueues.removeQueueFromRefKeeper(lastEvent);
                     }
                 }
             }

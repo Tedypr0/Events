@@ -24,13 +24,6 @@ public class Helper {
         queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), refKeeper);
     }
 
-    public static synchronized void checkIfQueueIsEmptyAndRemoveFromRefKeeper(Queue<Event> queueToCheck, Map<Integer, Queue<Event>> refKeeperToRemoveFrom) {
-        Event eventToReturn = queueToCheck.poll();
-        if (queueToCheck.isEmpty() && eventToReturn != null) {
-            refKeeperToRemoveFrom.remove(eventToReturn.hashCode());
-        }
-    }
-
     public void eventCreation() throws InterruptedException {
         for (int j = 0; j <= 5; j++) {
             queue.add(new Event(0, String.format("Event %d %d", 0, j)));

@@ -50,4 +50,10 @@ public class UniqueEventsQueue<T> {
         notify();
         return eventsQueues.poll();
     }
+
+    public synchronized void removeQueueFromRefKeeper(Event ref){
+        if(refKeeper.get(ref.hashCode()).isEmpty()){
+            refKeeper.remove(ref.hashCode());
+        }
+    }
 }
