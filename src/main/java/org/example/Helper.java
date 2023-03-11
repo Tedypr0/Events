@@ -33,7 +33,6 @@ public class Helper {
             for (int j = 0; j < 5; j++) {
                 queue.add(new Event(i, String.format("Event %d %d", i, j)));
                 // Added to check if our producer is slow, would we process all Events.
-                Thread.sleep(100);
             }
         }
 
