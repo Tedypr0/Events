@@ -13,7 +13,7 @@ public class StressTests {
     }
 
     @RepeatedTest(100)
-    public void stressTest_shouldAlways_EndProgram_gracefully() throws InterruptedException {
+    public void stressTest_shouldAlways_EndProgram_gracefully() {
         helper.eventCreation();
         helper.threadCreation();
     }

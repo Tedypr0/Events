@@ -1,6 +1,5 @@
 package org.example;
 
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,14 +7,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThreadJob implements Runnable {
     private final AtomicBoolean isPoisonFound;
     private final UniqueEventsQueue<Event> eventsQueues;
-    private final Map<Integer, Queue<Event>> refKeeper;
     private final AtomicInteger counter;
 
     public ThreadJob(AtomicBoolean isPoisonFound, UniqueEventsQueue<Event> eventsQueues,
-                     Map<Integer, Queue<Event>> refKeeper, AtomicInteger counter) {
+                     AtomicInteger counter) {
         this.isPoisonFound = isPoisonFound;
         this.eventsQueues = eventsQueues;
-        this.refKeeper = refKeeper;
         this.counter = counter;
     }
 
@@ -23,7 +20,7 @@ public class ThreadJob implements Runnable {
     public void run() {
         while (!isPoisonFound.get()) {
             Queue<Event> events;
-            Event lastEvent = null;
+            Event lastEvent;
             try {
                 events = eventsQueues.poll();
             } catch (InterruptedException e) {

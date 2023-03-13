@@ -24,7 +24,7 @@ public class Helper {
         queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), refKeeper);
     }
 
-    public void eventCreation() throws InterruptedException {
+    public void eventCreation() {
         for (int j = 0; j <= 5; j++) {
             queue.add(new Event(0, String.format("Event %d %d", 0, j)));
         }
@@ -40,7 +40,7 @@ public class Helper {
     }
 
     public void threadCreation() {
-        Runnable threadJob = new ThreadJob(isPoisonFound, queue, refKeeper, counter);
+        Runnable threadJob = new ThreadJob(isPoisonFound, queue, counter);
         for (int i = 0; i < THREAD_NUMBER; i++) {
             threads.add(new Thread(threadJob));
             threads.get(i).start();
