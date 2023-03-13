@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Objects;
+
 public class Event {
     private final int id;
     private final String message;
@@ -22,11 +24,11 @@ public class Event {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return id == event.id;
+        return id == event.id && Objects.equals(message, event.message);
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return Objects.hash(id, message);
     }
 }
