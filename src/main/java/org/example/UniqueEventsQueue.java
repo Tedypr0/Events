@@ -41,7 +41,7 @@ public class UniqueEventsQueue<T> {
 
         EventsQueue<T> queue = eventsQueues.peek();
 
-        if (queue.peek() != null && queue.peek().hashCode() == Integer.MAX_VALUE) {
+        if (queue.peek() != null && ((Event) queue.peek()).getId() == Integer.MAX_VALUE) {
             notify();
             return queue;
         }
