@@ -19,7 +19,7 @@ public class ThreadJob implements Runnable {
     @Override
     public void run() {
         while (!isPoisonFound.get()) {
-            Queue<Event> events;
+            EventsQueue<Event> events;
             Event lastEvent;
             try {
                 events = eventsQueues.poll();
@@ -33,7 +33,7 @@ public class ThreadJob implements Runnable {
                     while (!events.isEmpty()) {
                         lastEvent = events.poll();
                         counter.getAndIncrement();
-                        eventsQueues.removeQueueFromRefKeeper(lastEvent);
+                        eventsQueues.removeQueueFromRefKeeper(lastEvent.getId());
                     }
                 }
             }

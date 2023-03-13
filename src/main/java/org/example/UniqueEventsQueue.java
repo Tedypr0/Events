@@ -2,45 +2,44 @@ package org.example;
 
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class UniqueEventsQueue<T> {
     //Storage
-    private final Queue<Queue<T>> eventsQueues;
+    private final Queue<EventsQueue<T>> eventsQueues;
 
     //Keep references to Queues if we need to add new Events with existing keys.
-    private final Map<Integer, Queue<T>> refKeeper;
+    private final Map<Integer, EventsQueue<T>> refKeeper;
 
-    public UniqueEventsQueue(Queue<Queue<T>> eventsQueues, Map<Integer, Queue<T>> refKeeper) {
+    public UniqueEventsQueue(Queue<EventsQueue<T>> eventsQueues, Map<Integer, EventsQueue<T>> refKeeper) {
         this.eventsQueues = eventsQueues;
         this.refKeeper = refKeeper;
     }
 
-    public synchronized void add(T element) {
-        if (element.hashCode() == Integer.MAX_VALUE) {
-            Queue<T> poisonousQueue = new ConcurrentLinkedQueue<>();
+    public synchronized void add(int key, T element) {
+        if (key == Integer.MAX_VALUE) {
+            EventsQueue<T> poisonousQueue = new EventsQueue<>(refKeeper);
             poisonousQueue.add(element);
             eventsQueues.add(poisonousQueue);
             notify();
             return;
         }
-        if (refKeeper.containsKey(element.hashCode())) {
-            refKeeper.get(element.hashCode()).add(element);
+        if (refKeeper.containsKey(key)) {
+            refKeeper.get(key).add(element);
         } else {
-            Queue<T> newQueue = new ConcurrentLinkedQueue<>();
+            EventsQueue<T> newQueue = new EventsQueue<>(refKeeper);
             newQueue.add(element);
-            refKeeper.put(element.hashCode(), newQueue);
+            refKeeper.put(key, newQueue);
             eventsQueues.add(newQueue);
         }
         notify();
     }
 
-    public synchronized Queue<T> poll() throws InterruptedException {
+    public synchronized EventsQueue<T> poll() throws InterruptedException {
         while (eventsQueues.isEmpty()) {
             wait();
         }
 
-        Queue<T> queue = eventsQueues.peek();
+        EventsQueue<T> queue = eventsQueues.peek();
 
         if (queue.peek() != null && queue.peek().hashCode() == Integer.MAX_VALUE) {
             notify();
@@ -51,9 +50,11 @@ public class UniqueEventsQueue<T> {
         return eventsQueues.poll();
     }
 
-    public synchronized void removeQueueFromRefKeeper(Event ref){
-        if(refKeeper.get(ref.hashCode()).isEmpty()){
-            refKeeper.remove(ref.hashCode());
-        }
+    /*
+     * This has to be inside a queue add method, so we don't lock adding events to other queues.
+     */
+    public void removeQueueFromRefKeeper(int ref){
+        // Remove Queue from EventsQueue
+        refKeeper.get(ref).removeQueueFromRefKeeper(ref);
     }
 }
