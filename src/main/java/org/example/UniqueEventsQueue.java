@@ -48,9 +48,9 @@ public class UniqueEventsQueue<T> {
         }
 
         EventsQueue<T> queue = eventsQueues.peek();
-
+        T peekedEvent = queue.peek();
         // This if statements is for not removing the Queue containing poisonPill Event from eventsQueues.
-        if (queue.peek() != null && ((Event) queue.peek()).getId() == Integer.MAX_VALUE) {
+        if (peekedEvent != null && ((Event) peekedEvent).getId() == Integer.MAX_VALUE) {
             notify();
             return queue;
         }
@@ -64,6 +64,7 @@ public class UniqueEventsQueue<T> {
      */
     public void removeQueueFromRefKeeper(int ref) {
         // Remove Queue from EventsQueue
-            refKeeper.get(ref).removeQueueFromRefKeeper(ref);
+            EventsQueue<T> queue = refKeeper.get(ref);
+            queue.removeQueueFromRefKeeper(ref);
     }
 }
