@@ -15,23 +15,25 @@ public class UniqueEventsQueue<T> {
         this.refKeeper = refKeeper;
     }
 
-    public synchronized void add(int key, T element) {
+    public void add(int key, T element) {
         if (key == Integer.MAX_VALUE) {
             EventsQueue<T> poisonousQueue = new EventsQueue<>(refKeeper);
             poisonousQueue.add(element);
             eventsQueues.add(poisonousQueue);
-            notify();
             return;
         }
-        if (refKeeper.containsKey(key)) {
-            refKeeper.get(key).add(element);
-        } else {
-            EventsQueue<T> newQueue = new EventsQueue<>(refKeeper);
-            newQueue.add(element);
-            refKeeper.put(key, newQueue);
-            eventsQueues.add(newQueue);
+        synchronized (this) {
+            if (refKeeper.containsKey(key)) {
+                EventsQueue<T> events = refKeeper.get(key);
+                events.add(element);
+            } else {
+                EventsQueue<T> newQueue = new EventsQueue<>(refKeeper);
+                newQueue.add(element);
+                refKeeper.put(key, newQueue);
+                eventsQueues.add(newQueue);
+                notify();
+            }
         }
-        notify();
     }
 
     public synchronized EventsQueue<T> poll() throws InterruptedException {
@@ -53,7 +55,7 @@ public class UniqueEventsQueue<T> {
     /*
      * This has to be inside a queue add method, so we don't lock adding events to other queues.
      */
-    public void removeQueueFromRefKeeper(int ref){
+    public void removeQueueFromRefKeeper(int ref) {
         // Remove Queue from EventsQueue
         refKeeper.get(ref).removeQueueFromRefKeeper(ref);
     }
