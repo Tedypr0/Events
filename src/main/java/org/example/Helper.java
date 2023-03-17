@@ -25,17 +25,18 @@ public class Helper {
 
     public void eventCreation() {
         for (int j = 0; j <= 5; j++) {
-            queue.add(0,new Event(0, String.format("Event %d %d", 0, j)));
+            queue.add(0, new Event(0, String.format("Event %d %d", 0, j)));
         }
 
         for (int i = 1; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                queue.add(i,new Event(i, String.format("Event %d %d", i, j)));
-                // Added to check if our producer is slow, would we process all Events.
+                queue.add(i, new Event(i, String.format("Event %d %d", i, j)));
             }
         }
 
         queue.add(Integer.MAX_VALUE, new Event(Integer.MAX_VALUE, POISON_MESSAGE));
+//        while (!isPoisonFound.get()) {}
+//        System.out.println(counter.get());
     }
 
     public void threadCreation() {

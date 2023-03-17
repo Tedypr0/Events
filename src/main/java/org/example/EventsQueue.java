@@ -13,7 +13,6 @@ public class EventsQueue<T> {
         this.refKeeper = refKeeper;
     }
 
-
     public synchronized void add(T event) {
         queue.add(event);
     }
@@ -26,13 +25,14 @@ public class EventsQueue<T> {
         return queue.peek();
     }
 
-    public boolean isEmpty(){
+    // Needs to be synchronized, because main thread could add an Event and isEmpty, could return true.
+    public synchronized boolean isEmpty(){
         return queue.isEmpty();
     }
 
     // Allows us to remove queues from refKeeper map, without stopping the addition of new elements to other queues.
     // Synchronization of only the current queue.
-    public synchronized void removeQueueFromRefKeeper(Integer ref){
+    public synchronized void removeQueueFromRefKeeper(int ref){
         if(queue.isEmpty()){
             refKeeper.remove(ref);
         }

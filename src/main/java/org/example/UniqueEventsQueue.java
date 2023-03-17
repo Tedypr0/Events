@@ -7,7 +7,7 @@ public class UniqueEventsQueue<T> {
     //Storage
     private final Queue<EventsQueue<T>> eventsQueues;
 
-    //Keep references to Queues if we need to add new Events with existing keys.
+    //Keep references to Queues if we need to add new Events with existing keys and lookup.
     private final Map<Integer, EventsQueue<T>> refKeeper;
 
     public UniqueEventsQueue(Queue<EventsQueue<T>> eventsQueues, Map<Integer, EventsQueue<T>> refKeeper) {
@@ -22,11 +22,17 @@ public class UniqueEventsQueue<T> {
             eventsQueues.add(poisonousQueue);
             return;
         }
+
+        /* We need to synchronize if/else statement, because if two threads with the same key check if their key is
+         * contained in the refKeeper, and it's false, they both will continue to the else and create two new Queues
+         * instead of creating one queue and adding an element to it.
+         */
         synchronized (this) {
             if (refKeeper.containsKey(key)) {
                 EventsQueue<T> events = refKeeper.get(key);
                 events.add(element);
             } else {
+
                 EventsQueue<T> newQueue = new EventsQueue<>(refKeeper);
                 newQueue.add(element);
                 refKeeper.put(key, newQueue);
@@ -43,6 +49,7 @@ public class UniqueEventsQueue<T> {
 
         EventsQueue<T> queue = eventsQueues.peek();
 
+        // This if statements is for not removing the Queue containing poisonPill Event from eventsQueues.
         if (queue.peek() != null && ((Event) queue.peek()).getId() == Integer.MAX_VALUE) {
             notify();
             return queue;
@@ -53,10 +60,10 @@ public class UniqueEventsQueue<T> {
     }
 
     /*
-     * This has to be inside a queue add method, so we don't lock adding events to other queues.
+     * Removing QueueFromRefKeeper, which here isn't synchronized, but synchronization is done for every Queue we want to remove from refKeeper.
      */
     public void removeQueueFromRefKeeper(int ref) {
         // Remove Queue from EventsQueue
-        refKeeper.get(ref).removeQueueFromRefKeeper(ref);
+            refKeeper.get(ref).removeQueueFromRefKeeper(ref);
     }
 }
