@@ -33,13 +33,15 @@ public class ThreadJob implements Runnable {
                      * Will poll events, until events Queue is empty.
                      * Main thread could add a new Event, before the completion of events.isEmpty().
                      * Upon next invocation of isEmpty() should return false and continue polling.
-                     * If current thread reaches removeQueueFromRefKeeper method and by then main thread has added a
-                     * new Event, when we go to the method (rmFromRefKeeper), there is an isEmpty check and not remove the new
-                     * Event and lose it. After that continue as expected. (Check isEmpty poll ..etc..)
                      */
                     while (!events.isEmpty()) {
                         lastEvent = events.poll();
                         counter.getAndIncrement();
+                        /*
+                         * If the current thread reaches here and by then main thread has added a new Event,
+                         * when we go to the method (removeFromRefKeeper), there is an isEmpty check and not remove the new
+                         * Event and lose it. After that continue as expected. (Check isEmpty poll ..etc..)
+                         */
                         eventsQueues.removeQueueFromRefKeeper(lastEvent.getId());
                     }
                 }

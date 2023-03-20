@@ -27,19 +27,22 @@ public class UniqueEventsQueue<T> {
          * contained in the refKeeper, and it's false, they both will continue to the else and create two new Queues
          * instead of creating one queue and adding an element to it.
          */
-        synchronized (this) {
-            if (refKeeper.containsKey(key)) {
-                EventsQueue<T> events = refKeeper.get(key);
-                events.add(element);
-            } else {
 
+        // Reverse condition and synchronize only the top part.
+
+        synchronized (this){
+            if(!refKeeper.containsKey(key)){
                 EventsQueue<T> newQueue = new EventsQueue<>(refKeeper);
                 newQueue.add(element);
                 refKeeper.put(key, newQueue);
                 eventsQueues.add(newQueue);
                 notify();
+                return;
             }
         }
+
+        EventsQueue<T> events = refKeeper.get(key);
+        events.add(element);
     }
 
     public synchronized EventsQueue<T> poll() throws InterruptedException {
