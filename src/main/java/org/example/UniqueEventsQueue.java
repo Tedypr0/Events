@@ -24,8 +24,10 @@ public class UniqueEventsQueue<T> {
         }
 
         /*
-         * Synchronized checking if refKeeper contains a reference to a Queue. If it does not create a new Queue, add
-         * an Event to it and put it in refKeeper. If it does contain Event with this key (reference) we can add it directly
+         * Synchronized checking if refKeeper contains a reference to a Queue. If it does not, create a new Queue, add
+         * an Event to it and put it in refKeeper.
+         *
+         * If it does contain Event with this key (reference), we can add it directly
          * to the desired Queue. This synchronization is done in the Queue itself (EventsQueue), thus improving performance.
          */
 
