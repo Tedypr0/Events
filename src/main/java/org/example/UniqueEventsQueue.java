@@ -23,12 +23,11 @@ public class UniqueEventsQueue<T> {
             return;
         }
 
-        /* We need to synchronize if/else statement, because if two threads with the same key check if their key is
-         * contained in the refKeeper, and it's false, they both will continue to the else and create two new Queues
-         * instead of creating one queue and adding an element to it.
+        /*
+         * Synchronized checking if refKeeper contains a reference to a Queue. If it does not create a new Queue, add
+         * an Event to it and put it in refKeeper. If it does contain Event with this key (reference) we can add it directly
+         * to the desired Queue. This synchronization is done in the Queue itself (EventsQueue), thus improving performance.
          */
-
-        // Reverse condition and synchronize only the top part.
 
         synchronized (this){
             if(!refKeeper.containsKey(key)){

@@ -12,7 +12,7 @@ public class StressTests {
         helper = new Helper();
     }
 
-    @RepeatedTest(20000)
+    @RepeatedTest(50000)
     public void stressTest_shouldAlways_EndProgram_gracefully() {
         helper.eventCreation();
         helper.threadCreation();
