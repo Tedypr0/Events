@@ -29,10 +29,13 @@ public class UniqueEventsQueue<T> {
          *
          * If it does contain Event with this key (reference), we can add it directly
          * to the desired Queue. This synchronization is done in the Queue itself (EventsQueue), thus improving performance.
+         *
+         * If refKeeper.containsKey(key) returns true and continues on, by the time the current thread has reached adding
+         * an Event to a Queue, another thread could have already removed the Queue from refKeeper, thus we will lose an element/elements.
          */
 
-        synchronized (this){
-            if(!refKeeper.containsKey(key)){
+        synchronized (this) {
+            if (!refKeeper.containsKey(key)) {
                 EventsQueue<T> newQueue = new EventsQueue<>(refKeeper);
                 newQueue.add(element);
                 refKeeper.put(key, newQueue);
@@ -40,10 +43,10 @@ public class UniqueEventsQueue<T> {
                 notify();
                 return;
             }
-        }
 
-        EventsQueue<T> events = refKeeper.get(key);
-        events.add(element);
+            EventsQueue<T> events = refKeeper.get(key);
+            events.add(element);
+        }
     }
 
     public synchronized EventsQueue<T> poll() throws InterruptedException {
@@ -63,10 +66,7 @@ public class UniqueEventsQueue<T> {
         return eventsQueues.poll();
     }
 
-    /*
-     * Removing QueueFromRefKeeper, which here isn't synchronized, but synchronization is done for every Queue we want to remove from refKeeper.
-     */
-    public void removeQueueFromRefKeeper(int ref) {
+    public synchronized void removeQueueFromRefKeeper(int ref) {
         // Remove Queue from EventsQueue
             EventsQueue<T> queue = refKeeper.get(ref);
             queue.removeQueueFromRefKeeper(ref);

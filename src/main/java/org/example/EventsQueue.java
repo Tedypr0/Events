@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+
 public class EventsQueue<T> {
 
     Queue<T> queue = new ConcurrentLinkedQueue<>();
@@ -13,9 +14,7 @@ public class EventsQueue<T> {
         this.refKeeper = refKeeper;
     }
 
-    public synchronized void add(T event) {
-        queue.add(event);
-    }
+    public synchronized void add(T event) {queue.add(event);}
 
     public synchronized T poll() {
         return queue.poll();
