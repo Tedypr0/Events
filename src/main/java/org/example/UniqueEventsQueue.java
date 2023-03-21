@@ -67,9 +67,9 @@ public class UniqueEventsQueue<T> {
         return eventsQueues.poll();
     }
 
-    public synchronized void removeQueueFromRefKeeper(int ref) {
+    public synchronized boolean removeQueueFromRefKeeper(int ref) {
         // Remove Queue from EventsQueue
             EventsQueue<T> queue = refKeeper.get(ref);
-            queue.removeQueueFromRefKeeper(ref);
+           return queue.removeQueueFromRefKeeper(ref);
     }
 }

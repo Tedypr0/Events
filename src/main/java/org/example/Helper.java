@@ -23,6 +23,10 @@ public class Helper {
         queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), refKeeper);
     }
 
+    public int getResultInt(){
+        return counter.get();
+    }
+
     public void eventCreation() {
         for (int j = 0; j <= 5; j++) {
             queue.add(0, new Event(0, String.format("Event %d %d", 0, j)));
@@ -35,8 +39,13 @@ public class Helper {
         }
 
         queue.add(Integer.MAX_VALUE, new Event(Integer.MAX_VALUE, POISON_MESSAGE));
-//        while (!isPoisonFound.get()) {}
-//        System.out.println(counter.get());
+        for(int i = 0; i< THREAD_NUMBER; i++){
+            try {
+                threads.get(i).join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void threadCreation() {

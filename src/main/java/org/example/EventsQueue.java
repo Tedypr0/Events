@@ -31,9 +31,11 @@ public class EventsQueue<T> {
 
     // Allows us to remove queues from refKeeper map, without stopping the addition of new elements to other queues.
     // Synchronization of only the current queue.
-    public synchronized void removeQueueFromRefKeeper(int ref){
+    public synchronized boolean removeQueueFromRefKeeper(int ref){
         if(queue.isEmpty()){
             refKeeper.remove(ref);
+            return false;
         }
+        return true;
     }
 }

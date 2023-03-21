@@ -19,9 +19,11 @@ public class ThreadJob implements Runnable {
     public void run() {
         while (!isPoisonFound.get()) {
             EventsQueue<Event> events;
-            Event lastEvent = null;
             try {
                 events = eventsQueues.poll();
+                if(events == null){
+                    System.out.println("?");
+                }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -29,18 +31,30 @@ public class ThreadJob implements Runnable {
                 if (events.peek().getMessage().equals(Helper.POISON_MESSAGE)) {
                     isPoisonFound.set(true);
                 } else {
-                    while (!events.isEmpty()) {
-                        lastEvent = events.poll();
-                        counter.getAndIncrement();
-                    }
+                    pollElements(events);
                     /*
                      * Will try to remove Queue from refKeeper, when the current thread exists from while loop.
                      * There is a secondary isEmpty check that checks if the queue is empty. It's also synchronized, so
                      * no problems should be expected.
+                     *
+                     * Problem is that if this method does not remove queue from refKeeper (which it won't if there is at least 1 event in it),
+                     * we won't be able to process these events again, hey will be kept in refKeeper, but not in "Master" queue, from where Threads will poll queues.
                      */
-                    eventsQueues.removeQueueFromRefKeeper(lastEvent.getId());
+
                 }
             }
+        }
+    }
+
+    private void pollElements(EventsQueue<Event> eventsQueue) {
+        Event lastEvent = null;
+        while (!eventsQueue.isEmpty()) {
+            lastEvent = eventsQueue.poll();
+            counter.getAndIncrement();
+        }
+        assert lastEvent != null;
+        if (eventsQueues.removeQueueFromRefKeeper(lastEvent.getId())) {
+            pollElements(eventsQueue);
         }
     }
 }
