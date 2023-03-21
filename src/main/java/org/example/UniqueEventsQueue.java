@@ -31,7 +31,8 @@ public class UniqueEventsQueue<T> {
          * to the desired Queue. This synchronization is done in the Queue itself (EventsQueue), thus improving performance.
          *
          * If refKeeper.containsKey(key) returns true and continues on, by the time the current thread has reached adding
-         * an Event to a Queue, another thread could have already removed the Queue from refKeeper, thus we will lose an element/elements.
+         * an Event to a Queue, another thread could have already locked this queue by invoking removeQueueFromRefKeeper,
+         * thus we will not be able to add the element.
          */
 
         synchronized (this) {
