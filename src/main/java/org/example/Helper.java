@@ -23,7 +23,7 @@ public class Helper {
         queue = new UniqueEventsQueue<>(new ConcurrentLinkedQueue<>(), refKeeper);
     }
 
-    public int getResultInt(){
+    public int getResultInt() {
         return counter.get();
     }
 
@@ -39,7 +39,8 @@ public class Helper {
         }
 
         queue.add(Integer.MAX_VALUE, new Event(Integer.MAX_VALUE, POISON_MESSAGE));
-        for(int i = 0; i< THREAD_NUMBER; i++){
+
+        for (int i = 0; i < THREAD_NUMBER; i++) {
             try {
                 threads.get(i).join();
             } catch (InterruptedException e) {
@@ -49,9 +50,8 @@ public class Helper {
     }
 
     public void threadCreation() {
-        Runnable threadJob = new ThreadJob(isPoisonFound, queue, counter);
         for (int i = 0; i < THREAD_NUMBER; i++) {
-            threads.add(new Thread(threadJob));
+            threads.add(new ThreadJob(isPoisonFound, queue, counter, new AtomicBoolean(false)));
             threads.get(i).start();
         }
     }

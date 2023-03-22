@@ -3,6 +3,7 @@ package org.example;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class EventsQueue<T> {
@@ -31,11 +32,10 @@ public class EventsQueue<T> {
 
     // Allows us to remove queues from refKeeper map, without stopping the addition of new elements to other queues.
     // Synchronization of only the current queue.
-    public synchronized boolean removeQueueFromRefKeeper(int ref){
+    public synchronized void removeQueueFromRefKeeper(int ref, AtomicBoolean isQueueFinished){
         if(queue.isEmpty()){
             refKeeper.remove(ref);
-            return false;
+           isQueueFinished.set(true);
         }
-        return true;
     }
 }

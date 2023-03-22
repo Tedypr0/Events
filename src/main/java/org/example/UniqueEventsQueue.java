@@ -2,6 +2,7 @@ package org.example;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UniqueEventsQueue<T> {
     //Storage
@@ -29,10 +30,6 @@ public class UniqueEventsQueue<T> {
          *
          * If it does contain Event with this key (reference), we can add it directly
          * to the desired Queue. This synchronization is done in the Queue itself (EventsQueue), thus improving performance.
-         *
-         * If refKeeper.containsKey(key) returns true and continues on, by the time the current thread has reached adding
-         * an Event to a Queue, another thread could have already locked this queue by invoking removeQueueFromRefKeeper,
-         * thus we will not be able to add the element.
          */
 
         synchronized (this) {
@@ -67,9 +64,9 @@ public class UniqueEventsQueue<T> {
         return eventsQueues.poll();
     }
 
-    public synchronized boolean removeQueueFromRefKeeper(int ref) {
+    public synchronized void removeQueueFromRefKeeper(int ref, AtomicBoolean isQueueFinished) {
         // Remove Queue from EventsQueue
             EventsQueue<T> queue = refKeeper.get(ref);
-           return queue.removeQueueFromRefKeeper(ref);
+            queue.removeQueueFromRefKeeper(ref, isQueueFinished);
     }
 }

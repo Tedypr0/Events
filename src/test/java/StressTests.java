@@ -17,6 +17,6 @@ public class StressTests {
     public void stressTest_shouldAlways_EndProgram_gracefully() {
         helper.threadCreation();
         helper.eventCreation();
-        Assertions.assertEquals(helper.getResultInt(), 26);
+        Assertions.assertEquals( 26, helper.getResultInt());
     }
 }
